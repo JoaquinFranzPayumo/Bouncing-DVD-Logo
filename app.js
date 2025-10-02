@@ -17,13 +17,22 @@ function init() {
     );
     camera.position.z = 10;
 
-    renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     renderer.setSize(800, 800);
     document.body.appendChild(renderer.domElement);
 
-    // DVD Logo plane
-    const geometry = new THREE.PlaneGeometry(100, 50);
-    logoMaterial = new THREE.MeshBasicMaterial({ color: getRandomColor() });
+    // Load DVD logo texture
+    const textureLoader = new THREE.TextureLoader();
+    const dvdTexture = textureLoader.load('dvd-logo.png'); // place file in project root
+
+    // Material with texture + tint
+    logoMaterial = new THREE.MeshBasicMaterial({
+        map: dvdTexture,
+        transparent: true,
+        color: getRandomColor() // tint color
+    });
+
+    const geometry = new THREE.PlaneGeometry(120, 60); // Adjust ratio to match logo
     dvdLogo = new THREE.Mesh(geometry, logoMaterial);
     dvdLogo.position.set(0, 0, 0);
     scene.add(dvdLogo);
@@ -41,8 +50,8 @@ function animate() {
 }
 
 function checkBounds() {
-    const halfWidth = 50 * dvdLogo.scale.x;
-    const halfHeight = 25 * dvdLogo.scale.y;
+    const halfWidth = (60 * dvdLogo.scale.x);
+    const halfHeight = (30 * dvdLogo.scale.y);
 
     // Check X bounds
     if (dvdLogo.position.x + halfWidth >= 400 || dvdLogo.position.x - halfWidth <= -400) {
@@ -59,11 +68,11 @@ function checkBounds() {
 
 function bounce() {
     bounceCount++;
-    logoMaterial.color.set(getRandomColor());
-    dvdLogo.scale.multiplyScalar(0.85);
+    logoMaterial.color.set(getRandomColor()); // tint texture with new color
+    dvdLogo.scale.multiplyScalar(0.85); // shrink
 
     if (dvdLogo.scale.x < 0.05 || dvdLogo.scale.y < 0.05) {
-        scene.remove(dvdLogo); // vanish after too small
+        scene.remove(dvdLogo); // vanish when too small
     }
 }
 
